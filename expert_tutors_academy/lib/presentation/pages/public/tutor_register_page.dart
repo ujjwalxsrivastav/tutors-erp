@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../data/models/tutor_model.dart';
-import '../../../data/services/auth_service.dart';
-import '../../../data/services/tutor_service.dart';
 
 /// Complete tutor registration page
 class TutorRegisterPage extends ConsumerStatefulWidget {
@@ -256,24 +256,70 @@ class _TutorRegisterPageState extends ConsumerState<TutorRegisterPage> {
 
     setState(() => _isSubmitting = true);
     try {
-      final authService = ref.read(authServiceProvider);
-      final user = await authService.register(email: _emailCtrl.text.trim(), password: _passwordCtrl.text, name: _nameCtrl.text.trim(), phone: _phoneCtrl.text.trim(), role: 'TUTOR');
+      // Use Firebase SDK directly to avoid Riverpod provider teardown
+      // when authStateProvider fires after createUserWithEmailAndPassword
+      final auth = FirebaseAuth.instance;
+      final firestore = FirebaseFirestore.instance;
 
-      final tutorRepo = ref.read(tutorRepositoryProvider);
-      await tutorRepo.createTutorWithId(user.uid, TutorModel(
-        id: user.uid, userId: user.uid, name: _nameCtrl.text.trim(), phone: _phoneCtrl.text.trim(), email: _emailCtrl.text.trim(),
-        gender: _gender, qualification: _qualificationCtrl.text, institution: _institutionCtrl.text.isNotEmpty ? _institutionCtrl.text : null,
-        teachingExperience: int.tryParse(_experienceCtrl.text) ?? 0, subjects: _selectedSubjects, classesTaught: _selectedClasses,
-        teachingMode: _teachingMode, preferredLocations: _locationCtrl.text.isNotEmpty ? [_locationCtrl.text.trim()] : [],
-        languages: _languages, expectedFee: double.tryParse(_feeCtrl.text) ?? 0,
-        aboutTutor: _aboutCtrl.text.isNotEmpty ? _aboutCtrl.text : null, createdAt: DateTime.now(), updatedAt: DateTime.now(),
-      ));
+      // 1. Create Firebase Auth user
+      final credential = await auth.createUserWithEmailAndPassword(
+        email: _emailCtrl.text.trim(),
+        password: _passwordCtrl.text,
+      );
+      final uid = credential.user!.uid;
 
-      await authService.signOut(); // Sign out after registration
-      setState(() { _isSuccess = true; _isSubmitting = false; });
+      // 2. Write to users collection
+      await firestore.collection('users').doc(uid).set({
+        'uid': uid,
+        'name': _nameCtrl.text.trim(),
+        'email': _emailCtrl.text.trim(),
+        'phone': _phoneCtrl.text.trim(),
+        'role': 'TUTOR',
+        'isActive': true,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // 3. Write full tutor profile to tutors collection
+      final tutorData = {
+        'id': uid,
+        'userId': uid,
+        'name': _nameCtrl.text.trim(),
+        'email': _emailCtrl.text.trim(),
+        'phone': _phoneCtrl.text.trim(),
+        'gender': _gender,
+        'qualification': _qualificationCtrl.text,
+        'institution': _institutionCtrl.text.isNotEmpty ? _institutionCtrl.text : null,
+        'teachingExperience': int.tryParse(_experienceCtrl.text) ?? 0,
+        'subjects': _selectedSubjects,
+        'classesTaught': _selectedClasses,
+        'teachingMode': _teachingMode,
+        'preferredLocations': _locationCtrl.text.isNotEmpty ? [_locationCtrl.text.trim()] : [],
+        'languages': _languages,
+        'expectedFee': double.tryParse(_feeCtrl.text) ?? 0.0,
+        'aboutTutor': _aboutCtrl.text.isNotEmpty ? _aboutCtrl.text : null,
+        'verificationStatus': 'PENDING',
+        'isActive': true,
+        'performance': {
+          'leadsReceived': 0,
+          'demosCompleted': 0,
+          'tuitionsStarted': 0,
+          'rating': 0.0,
+        },
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      await firestore.collection('tutors').doc(uid).set(tutorData);
+
+      // 4. Sign out after all writes complete
+      await auth.signOut();
+
+      if (mounted) setState(() { _isSuccess = true; _isSubmitting = false; });
     } catch (e) {
-      setState(() => _isSubmitting = false);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error));
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error));
+      }
     }
   }
 
@@ -287,7 +333,7 @@ class _TutorRegisterPageState extends ConsumerState<TutorRegisterPage> {
         const SizedBox(height: 12),
         Text('Your profile is under review. We\'ll verify your details and notify you once approved.', style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary), textAlign: TextAlign.center),
         const SizedBox(height: 32),
-        ElevatedButton(onPressed: () => context.go('/login'), child: const Text('Go to Login')),
+        ElevatedButton(onPressed: () => context.go('/tutor/login'), child: const Text('Go to Login')),
       ]),
     )));
   }

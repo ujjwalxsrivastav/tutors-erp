@@ -52,7 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     refreshListenable: notifier,
     debugLogDiagnostics: false,
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final authUser = authService.currentUser;
       final isLoggedIn = authUser != null;
       final loc = state.matchedLocation;
@@ -69,43 +69,32 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/tutor/login';
       }
 
-      // Public pages are always accessible
+      // Public pages are always accessible (including register-tutor, even during auth)
       if (isHome || isEnquiry || isRegisterTutor) {
         return null;
       }
 
       // If user is accessing Admin Login page
       if (isAdminLogin) {
-        if (isLoggedIn) {
-          // If already logged in, let them access dashboard
-          return '/admin/dashboard';
-        }
+        if (isLoggedIn) return '/admin/dashboard';
         return null;
       }
 
       // If user is accessing Tutor Login page
       if (isTutorLogin) {
-        if (isLoggedIn) {
-          return '/tutor/dashboard';
-        }
+        if (isLoggedIn) return '/tutor/dashboard';
         return null;
       }
 
       // ─── Protected Admin Routes ─────────────────────────
       if (loc == '/admin' || loc.startsWith('/admin/')) {
-        if (!isLoggedIn) {
-          // Send to dedicated Admin Login
-          return '/admin/login';
-        }
+        if (!isLoggedIn) return '/admin/login';
         return null;
       }
 
       // ─── Protected Tutor Routes ─────────────────────────
       if (loc == '/tutor' || loc.startsWith('/tutor/')) {
-        if (!isLoggedIn) {
-          // Send to dedicated Tutor Login
-          return '/tutor/login';
-        }
+        if (!isLoggedIn) return '/tutor/login';
         return null;
       }
 
