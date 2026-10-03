@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Tutor profile pictures
+    match /tutors/{userId}/profile/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(userId) && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Tutor verification documents (ID proof, degree certificates)
+    match /tutors/{userId}/documents/{fileName} {
+      allow read: if isOwner(userId) || request.auth.token.role == 'SUPER_ADMIN' || request.auth.token.role == 'AGENT';
+      allow write: if isOwner(userId) && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // General app uploads
+    match /uploads/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.resource.size < 10 * 1024 * 1024;
+    }
+  }
+}

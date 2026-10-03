@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/operational_services.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../data/services/tutor_service.dart';
 
 class TutorDashboardPage extends ConsumerWidget {
   const TutorDashboardPage({super.key});
@@ -18,7 +18,7 @@ class TutorDashboardPage extends ConsumerWidget {
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(title: const Text('Dashboard'), actions: [
         IconButton(icon: const Icon(Icons.notifications_outlined), onPressed: () => context.go('/tutor/notifications')),
-        IconButton(icon: const Icon(Icons.logout), onPressed: () async { await ref.read(authServiceProvider).signOut(); if (context.mounted) context.go('/login'); }),
+        IconButton(icon: const Icon(Icons.logout), onPressed: () async { await ref.read(authServiceProvider).signOut(); if (context.mounted) context.go('/tutor/login'); }),
         const SizedBox(width: 8),
       ]),
       body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -34,7 +34,7 @@ class TutorDashboardPage extends ConsumerWidget {
           builder: (context, snapshot) {
             final assignments = snapshot.data ?? [];
             if (assignments.isEmpty) return const EmptyState(icon: Icons.inbox_outlined, title: 'No pending assignments');
-            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: assignments.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: assignments.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (_, i) {
                 final a = assignments[i];
                 return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(AppTheme.radiusMd), border: Border.all(color: AppTheme.info.withValues(alpha: 0.3))),
@@ -69,7 +69,7 @@ class TutorDashboardPage extends ConsumerWidget {
           builder: (context, snapshot) {
             final tuitions = (snapshot.data ?? []).where((t) => t.isActive).toList();
             if (tuitions.isEmpty) return const EmptyState(icon: Icons.auto_stories_outlined, title: 'No active tuitions');
-            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: tuitions.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: tuitions.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (_, i) {
                 final t = tuitions[i];
                 return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(AppTheme.radiusMd), border: Border.all(color: AppTheme.border)),
@@ -88,6 +88,3 @@ class TutorDashboardPage extends ConsumerWidget {
     );
   }
 }
-
-// Import needed
-import '../../../data/services/tutor_service.dart';

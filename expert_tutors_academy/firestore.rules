@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (getUserRole() == 'SUPER_ADMIN' || getUserRole() == 'AGENT');
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserRole() == 'SUPER_ADMIN';
+    }
+
+    // ─── Users Collection ─────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isOwner(userId) || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // ─── Leads Collection ─────────────────────────────────────────
+    match /leads/{leadId} {
+      // Public can create enquiry leads without login
+      allow create: if true;
+      allow read: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // ─── Tutors Collection ────────────────────────────────────────
+    match /tutors/{tutorId} {
+      allow create, update: if true;
+      allow read: if isAuthenticated();
+      allow delete: if isSuperAdmin();
+    }
+
+    // ─── Lead Assignments ─────────────────────────────────────────
+    match /leadAssignments/{assignmentId} {
+      allow create: if isAdmin();
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.tutorId == request.auth.uid);
+      allow update: if isAdmin() || (isAuthenticated() && resource.data.tutorId == request.auth.uid);
+      allow delete: if isSuperAdmin();
+    }
+
+    // ─── Tuitions (Converted Leads) ───────────────────────────────
+    match /tuitions/{tuitionId} {
+      allow create, update, delete: if isAdmin();
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.tutorId == request.auth.uid);
+    }
+
+    // ─── Demos ───────────────────────────────────────────────────
+    match /demos/{demoId} {
+      allow create, update, delete: if isAdmin();
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.tutorId == request.auth.uid);
+    }
+
+    // ─── Follow-ups ───────────────────────────────────────────────
+    match /followUps/{followUpId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    // ─── Notifications ────────────────────────────────────────────
+    match /notifications/{notificationId} {
+      allow read, update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Audit Logs ───────────────────────────────────────────────
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Audit logs are immutable
+    }
+
+    // ─── System Settings ─────────────────────────────────────────
+    match /settings/leadSequence {
+      allow read, write: if true;
+    }
+
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}

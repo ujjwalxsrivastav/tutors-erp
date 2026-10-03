@@ -112,7 +112,7 @@ class AdminShell extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8)),
                       onTap: () async {
                         await ref.read(authServiceProvider).signOut();
-                        if (context.mounted) context.go('/login');
+                        if (context.mounted) context.go('/admin/login');
                       },
                     ),
                   ),
@@ -165,7 +165,7 @@ class AdminShell extends ConsumerWidget {
                       tooltip: 'Sign Out',
                       onPressed: () async {
                         await ref.read(authServiceProvider).signOut();
-                        if (context.mounted) context.go('/login');
+                        if (context.mounted) context.go('/admin/login');
                       },
                     ),
                   ),

@@ -5,7 +5,6 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../data/models/lead_model.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/lead_service.dart';
 import '../../../data/services/operational_services.dart';
 
@@ -65,9 +64,6 @@ class DashboardPage extends ConsumerWidget {
                   final assignedLeads = leads
                       .where((l) => l.status == 'ASSIGNED')
                       .length;
-                  final demoScheduled = leads
-                      .where((l) => l.status == 'DEMO_SCHEDULED')
-                      .length;
 
                   final metrics = [
                     MetricCard(
@@ -105,7 +101,7 @@ class DashboardPage extends ConsumerWidget {
                         icon: Icons.auto_stories_outlined,
                         color: AppTheme.success,
                       ),
-                      error: (_, __) => const MetricCard(
+                      error: (_, _) => const MetricCard(
                         label: 'Active Tuitions',
                         value: '-',
                         icon: Icons.auto_stories_outlined,
@@ -126,7 +122,7 @@ class DashboardPage extends ConsumerWidget {
                         icon: Icons.event_outlined,
                         color: AppTheme.info,
                       ),
-                      error: (_, __) => const MetricCard(
+                      error: (_, _) => const MetricCard(
                         label: 'Demos Today',
                         value: '-',
                         icon: Icons.event_outlined,
@@ -147,7 +143,7 @@ class DashboardPage extends ConsumerWidget {
                         icon: Icons.checklist_outlined,
                         color: AppTheme.warning,
                       ),
-                      error: (_, __) => const MetricCard(
+                      error: (_, _) => const MetricCard(
                         label: 'Follow-ups Due',
                         value: '-',
                         icon: Icons.checklist_outlined,
@@ -270,7 +266,7 @@ class DashboardPage extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: leads.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) =>
           _buildLeadCard(context, leads[index]),
     );

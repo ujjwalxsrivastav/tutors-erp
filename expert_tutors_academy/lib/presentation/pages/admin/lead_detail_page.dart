@@ -7,7 +7,8 @@ import '../../../core/widgets/common_widgets.dart';
 import '../../../data/models/lead_model.dart';
 import '../../../data/services/lead_service.dart';
 import '../../../data/services/operational_services.dart';
-import '../../../data/services/auth_service.dart';
+import '../../../data/models/models.dart';
+import '../../../data/services/tutor_service.dart';
 
 class LeadDetailPage extends ConsumerWidget {
   final String leadId;
@@ -634,7 +635,3 @@ class LeadDetailPage extends ConsumerWidget {
     );
   }
 }
-
-// Import needed for DemoModel, TuitionModel, FollowUpModel
-import '../../../data/models/models.dart';
-import '../../../data/services/tutor_service.dart';

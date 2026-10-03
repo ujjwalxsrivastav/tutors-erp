@@ -176,7 +176,7 @@ class _TutorRegisterPageState extends ConsumerState<TutorRegisterPage> {
         const SizedBox(height: 20),
         _label('Highest Qualification'),
         DropdownButtonFormField<String>(
-          value: _qualificationCtrl.text.isNotEmpty ? _qualificationCtrl.text : null,
+          initialValue: _qualificationCtrl.text.isNotEmpty ? _qualificationCtrl.text : null,
           decoration: const InputDecoration(hintText: 'Select qualification'),
           items: AppConstants.qualifications.map((q) => DropdownMenuItem(value: q, child: Text(q))).toList(),
           onChanged: (v) => _qualificationCtrl.text = v ?? '',

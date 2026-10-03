@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/operational_services.dart';
 
 class FollowUpsPage extends ConsumerWidget {
@@ -17,7 +16,7 @@ class FollowUpsPage extends ConsumerWidget {
       body: followUps.when(
         data: (list) {
           if (list.isEmpty) return const EmptyState(icon: Icons.checklist_outlined, title: 'No follow-ups due', subtitle: 'All caught up! Follow-ups will appear when they\'re due.');
-          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: list.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: list.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (_, i) {
               final f = list[i];
               return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(

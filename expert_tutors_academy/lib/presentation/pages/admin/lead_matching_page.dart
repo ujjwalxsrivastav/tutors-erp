@@ -9,6 +9,7 @@ import '../../../data/services/lead_service.dart';
 import '../../../data/services/matching_engine.dart';
 import '../../../data/services/operational_services.dart';
 import '../../../data/services/auth_service.dart';
+import '../../../data/services/tutor_service.dart';
 
 class LeadMatchingPage extends ConsumerStatefulWidget {
   final String leadId;
@@ -237,7 +238,7 @@ class _LeadMatchingPageState extends ConsumerState<LeadMatchingPage> {
     return ListView.separated(
       padding: const EdgeInsets.all(20),
       itemCount: _matches!.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) =>
           _buildMatchCard(_matches![index]),
     );
@@ -319,7 +320,7 @@ class _LeadMatchingPageState extends ConsumerState<LeadMatchingPage> {
               _buildChip(Icons.currency_rupee,
                   '₹${tutor.expectedFee.toStringAsFixed(0)}/mo'),
               _buildChip(Icons.star_outline,
-                  tutor.rating > 0 ? '${tutor.rating.toStringAsFixed(1)}' : 'New'),
+                  tutor.rating > 0 ? tutor.rating.toStringAsFixed(1) : 'New'),
               _buildChip(Icons.laptop_outlined, tutor.teachingMode),
             ],
           ),

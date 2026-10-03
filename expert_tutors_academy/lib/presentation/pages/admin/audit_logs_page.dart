@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/operational_services.dart';
 
 class AuditLogsPage extends ConsumerWidget {
@@ -17,7 +16,7 @@ class AuditLogsPage extends ConsumerWidget {
       body: logs.when(
         data: (list) {
           if (list.isEmpty) return const EmptyState(icon: Icons.history, title: 'No audit logs', subtitle: 'System activities will be recorded here.');
-          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: list.length, separatorBuilder: (_, __) => const SizedBox(height: 4),
+          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: list.length, separatorBuilder: (_, _) => const SizedBox(height: 4),
             itemBuilder: (_, i) {
               final log = list[i];
               return Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(AppTheme.radiusSm), border: Border.all(color: AppTheme.borderLight)),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/common_widgets.dart';
 import '../../../data/services/matching_engine.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -50,7 +49,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   const SizedBox(height: 16),
                   ElevatedButton(onPressed: () async {
                     await ref.read(matchingEngineProvider).saveWeights(_weights!);
-                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Weights saved successfully')));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Weights saved successfully')));
+                    }
                   }, child: const Text('Save Weights')),
                 ]),
               ),

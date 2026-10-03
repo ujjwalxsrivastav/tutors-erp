@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/operational_services.dart';
 import '../../../data/services/auth_service.dart';
 
@@ -19,7 +18,7 @@ class TutorLeadsPage extends ConsumerWidget {
         builder: (context, snapshot) {
           final assignments = snapshot.data ?? [];
           if (assignments.isEmpty) return const EmptyState(icon: Icons.people_outline, title: 'No leads yet', subtitle: 'New tuition opportunities will appear here.');
-          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: assignments.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: assignments.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (_, i) {
               final a = assignments[i];
               return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(AppTheme.radiusMd), border: Border.all(color: AppTheme.border)),

@@ -19,7 +19,7 @@ class DemosPage extends ConsumerWidget {
         todaysDemos.when(
           data: (demos) {
             if (demos.isEmpty) return const EmptyState(icon: Icons.event_outlined, title: 'No demos today');
-            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: demos.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: demos.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (_, i) => _buildDemoCard(context, ref, demos[i]));
           },
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -32,7 +32,7 @@ class DemosPage extends ConsumerWidget {
           builder: (context, snapshot) {
             final allDemos = snapshot.data ?? [];
             if (allDemos.isEmpty) return const EmptyState(icon: Icons.event_outlined, title: 'No demos scheduled');
-            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: allDemos.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+            return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: allDemos.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (_, i) => _buildDemoCard(context, ref, allDemos[i]));
           },
         ),

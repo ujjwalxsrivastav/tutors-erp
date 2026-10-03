@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/operational_services.dart';
 
 class AssignmentsPage extends ConsumerWidget {
@@ -19,7 +18,7 @@ class AssignmentsPage extends ConsumerWidget {
           if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
           final assignments = snapshot.data ?? [];
           if (assignments.isEmpty) return const EmptyState(icon: Icons.assignment_outlined, title: 'No assignments yet', subtitle: 'Assignments will appear here when tutors are assigned to leads.');
-          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: assignments.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: assignments.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
               final a = assignments[i];
               return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(AppTheme.radiusMd), border: Border.all(color: AppTheme.border)),

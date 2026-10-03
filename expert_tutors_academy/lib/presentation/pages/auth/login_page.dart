@@ -63,24 +63,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     const SizedBox(height: 32),
                     Text(
-                      'Expert Tutors\nAcademy',
-                      style: AppTheme.displayLarge
-                          .copyWith(color: Colors.white),
+                      'Tutor Portal',
+                      style: AppTheme.displaySmall.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Text(
-                      'Manage your tuition agency with\nintelligent lead matching and\noperational visibility.',
+                      'Access your student leads, active tuition assignments, schedules, and earnings.',
                       style: AppTheme.bodyLarge
-                          .copyWith(color: Colors.white70, fontSize: 18),
+                          .copyWith(color: Colors.white70, fontSize: 16),
                     ),
                     const SizedBox(height: 48),
-                    _buildFeatureRow(Icons.bolt, 'Smart tutor matching'),
+                    _buildFeatureRow(Icons.bolt, 'Instant student lead notifications'),
                     const SizedBox(height: 12),
                     _buildFeatureRow(
-                        Icons.dashboard_outlined, 'Real-time dashboard'),
+                        Icons.school_outlined, 'Direct assignments in your preferred localities'),
                     const SizedBox(height: 12),
                     _buildFeatureRow(
-                        Icons.analytics_outlined, 'Complete analytics'),
+                        Icons.star_outline, 'Transparent ratings & conversion metrics'),
                   ],
                 ),
               ),
@@ -124,7 +126,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           const SizedBox(height: 24),
                         ],
                         Text(
-                          'Welcome back',
+                          'Tutor Login',
                           style: AppTheme.displaySmall,
                           textAlign: isDesktop
                               ? TextAlign.left
@@ -132,7 +134,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Sign in to your dashboard',
+                          'Sign in to access your Tutor Dashboard',
                           style: AppTheme.bodyLarge
                               .copyWith(color: AppTheme.textSecondary),
                           textAlign: isDesktop
@@ -232,10 +234,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text('Sign In'),
+                                : const Text('Sign In as Tutor'),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Don't have a tutor account? ",
+                                style: AppTheme.bodySmall),
+                            GestureDetector(
+                              onTap: () => context.go('/register-tutor'),
+                              child: Text(
+                                'Register here',
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppTheme.primaryGreen,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
                         Center(
                           child: TextButton(
                             onPressed: () => context.go('/'),

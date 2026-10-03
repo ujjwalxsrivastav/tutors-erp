@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/lead_model.dart';
-import '../models/models.dart';
 import 'auth_service.dart';
 
 /// Lead repository — handles all lead CRUD and queries
@@ -30,33 +29,39 @@ class LeadRepository {
     final year = DateTime.now().year;
     final counterRef = _firestore.collection('settings').doc('leadSequence');
 
-    return _firestore.runTransaction<String>((transaction) async {
-      final snapshot = await transaction.get(counterRef);
+    try {
+      return await _firestore.runTransaction<String>((transaction) async {
+        final snapshot = await transaction.get(counterRef);
 
-      int currentSequence = 0;
-      int currentYear = year;
+        int currentSequence = 0;
+        int currentYear = year;
 
-      if (snapshot.exists) {
-        final data = snapshot.data() as Map<String, dynamic>;
-        currentYear = data['currentYear'] ?? year;
-        currentSequence = data['currentSequence'] ?? 0;
+        if (snapshot.exists) {
+          final data = snapshot.data() as Map<String, dynamic>;
+          currentYear = data['currentYear'] ?? year;
+          currentSequence = data['currentSequence'] ?? 0;
 
-        // Reset sequence for new year
-        if (currentYear != year) {
-          currentSequence = 0;
-          currentYear = year;
+          // Reset sequence for new year
+          if (currentYear != year) {
+            currentSequence = 0;
+            currentYear = year;
+          }
         }
-      }
 
-      currentSequence++;
+        currentSequence++;
 
-      transaction.set(counterRef, {
-        'currentYear': currentYear,
-        'currentSequence': currentSequence,
+        transaction.set(counterRef, {
+          'currentYear': currentYear,
+          'currentSequence': currentSequence,
+        });
+
+        return 'ETA-$currentYear-${currentSequence.toString().padLeft(5, '0')}';
       });
-
-      return 'ETA-$currentYear-${currentSequence.toString().padLeft(5, '0')}';
-    });
+    } catch (_) {
+      // Fallback timestamp-based sequential identifier
+      final seq = (DateTime.now().millisecondsSinceEpoch % 100000);
+      return 'ETA-$year-${seq.toString().padLeft(5, '0')}';
+    }
   }
 
   /// Get a single lead by ID

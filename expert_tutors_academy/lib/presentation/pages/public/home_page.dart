@@ -11,7 +11,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 900;
-    final isTablet = screenWidth > 600;
 
     return Scaffold(
       backgroundColor: AppTheme.white,
@@ -68,7 +67,7 @@ class HomePage extends StatelessWidget {
                           .copyWith(color: AppTheme.textPrimary)),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => context.go('/tutor/login'),
                   child: Text('For Tutors',
                       style: AppTheme.bodyMedium
                           .copyWith(color: AppTheme.textPrimary)),
@@ -80,9 +79,15 @@ class HomePage extends StatelessWidget {
                 child: const Text('Become a Tutor'),
               ),
               const SizedBox(width: 8),
-              TextButton(
-                onPressed: () => context.go('/login'),
-                child: const Text('Login'),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                ),
+                onPressed: () => context.go('/tutor/login'),
+                icon: const Icon(Icons.school_outlined, size: 16),
+                label: const Text('Tutor Login'),
               ),
               const SizedBox(width: 16),
             ],

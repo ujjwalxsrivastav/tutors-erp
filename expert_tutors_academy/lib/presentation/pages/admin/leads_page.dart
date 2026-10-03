@@ -18,7 +18,6 @@ class _LeadsPageState extends ConsumerState<LeadsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String? _statusFilter;
-  String _searchQuery = '';
 
   final _tabs = const [
     Tab(text: 'All'),
@@ -96,7 +95,7 @@ class _LeadsPageState extends ConsumerState<LeadsPage>
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: leads.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, index) =>
                 _buildLeadCard(context, leads[index]),
           );

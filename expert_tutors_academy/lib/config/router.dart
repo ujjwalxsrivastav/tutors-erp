@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/services/auth_service.dart';
-import '../data/models/user_model.dart';
 import '../presentation/pages/public/home_page.dart';
 import '../presentation/pages/public/enquiry_page.dart';
 import '../presentation/pages/public/tutor_register_page.dart';
 import '../presentation/pages/auth/login_page.dart';
+import '../presentation/pages/auth/admin_login_page.dart';
 import '../presentation/pages/admin/admin_shell.dart';
 import '../presentation/pages/admin/dashboard_page.dart';
 import '../presentation/pages/admin/leads_page.dart';
@@ -31,29 +31,82 @@ import '../presentation/pages/tutor/tutor_profile_page.dart';
 import '../presentation/pages/tutor/tutor_performance_page.dart';
 import '../presentation/pages/tutor/tutor_notifications_page.dart';
 
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+
+  RouterNotifier(this._ref) {
+    _ref.listen(authStateProvider, (_, _) => notifyListeners());
+    _ref.listen(currentUserProvider, (_, _) => notifyListeners());
+  }
+}
+
+final routerNotifierProvider = Provider<RouterNotifier>((ref) {
+  return RouterNotifier(ref);
+});
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
+  final notifier = ref.watch(routerNotifierProvider);
+  final authService = ref.watch(authServiceProvider);
 
   return GoRouter(
     initialLocation: '/',
-    debugLogDiagnostics: true,
+    refreshListenable: notifier,
+    debugLogDiagnostics: false,
     redirect: (context, state) {
-      final isLoggedIn = authState.valueOrNull != null;
-      final isLoginPage = state.matchedLocation == '/login';
-      final isPublicRoute = state.matchedLocation == '/' ||
-          state.matchedLocation == '/enquiry' ||
-          state.matchedLocation == '/register-tutor' ||
-          state.matchedLocation.startsWith('/enquiry');
+      final authUser = authService.currentUser;
+      final isLoggedIn = authUser != null;
+      final loc = state.matchedLocation;
 
-      // Public routes are always accessible
-      if (isPublicRoute) return null;
+      // Public routes
+      final isHome = loc == '/';
+      final isEnquiry = loc.startsWith('/enquiry');
+      final isRegisterTutor = loc == '/register-tutor';
+      final isAdminLogin = loc == '/admin/login';
+      final isTutorLogin = loc == '/tutor/login';
+      final isOldLogin = loc == '/login';
 
-      // If not logged in and trying to access protected route
-      if (!isLoggedIn && !isLoginPage) return '/login';
+      if (isOldLogin) {
+        return '/tutor/login';
+      }
 
-      // If logged in and on login page, redirect to appropriate dashboard
-      if (isLoggedIn && isLoginPage) {
-        return '/admin/dashboard';
+      // Public pages are always accessible
+      if (isHome || isEnquiry || isRegisterTutor) {
+        return null;
+      }
+
+      // If user is accessing Admin Login page
+      if (isAdminLogin) {
+        if (isLoggedIn) {
+          // If already logged in, let them access dashboard
+          return '/admin/dashboard';
+        }
+        return null;
+      }
+
+      // If user is accessing Tutor Login page
+      if (isTutorLogin) {
+        if (isLoggedIn) {
+          return '/tutor/dashboard';
+        }
+        return null;
+      }
+
+      // ─── Protected Admin Routes ─────────────────────────
+      if (loc == '/admin' || loc.startsWith('/admin/')) {
+        if (!isLoggedIn) {
+          // Send to dedicated Admin Login
+          return '/admin/login';
+        }
+        return null;
+      }
+
+      // ─── Protected Tutor Routes ─────────────────────────
+      if (loc == '/tutor' || loc.startsWith('/tutor/')) {
+        if (!isLoggedIn) {
+          // Send to dedicated Tutor Login
+          return '/tutor/login';
+        }
+        return null;
       }
 
       return null;
@@ -77,11 +130,28 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/login',
-        name: 'login',
+        redirect: (context, state) => '/tutor/login',
+      ),
+      GoRoute(
+        path: '/tutor/login',
+        name: 'tutor-login',
         builder: (context, state) => const LoginPage(),
       ),
+      GoRoute(
+        path: '/admin/login',
+        name: 'admin-login',
+        builder: (context, state) => const AdminLoginPage(),
+      ),
+      GoRoute(
+        path: '/admin',
+        redirect: (context, state) => '/admin/dashboard',
+      ),
+      GoRoute(
+        path: '/tutor',
+        redirect: (context, state) => '/tutor/dashboard',
+      ),
 
-      // ─── Admin/Agent Routes ───────────────────────────
+      // ─── Admin/Agent Protected Shell ───────────────────
       ShellRoute(
         builder: (context, state, child) => AdminShell(child: child),
         routes: [
@@ -164,7 +234,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // ─── Tutor Routes ────────────────────────────────
+      // ─── Tutor Protected Shell ─────────────────────────
       ShellRoute(
         builder: (context, state, child) => TutorShell(child: child),
         routes: [

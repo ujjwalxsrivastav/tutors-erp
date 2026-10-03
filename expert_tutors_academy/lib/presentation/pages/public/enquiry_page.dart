@@ -21,7 +21,6 @@ class _EnquiryPageState extends ConsumerState<EnquiryPage> {
   int _currentStep = 0;
   bool _isSubmitting = false;
   bool _isSuccess = false;
-  String _leadNumber = '';
 
   // Form data
   final _parentNameController = TextEditingController();
@@ -338,7 +337,7 @@ class _EnquiryPageState extends ConsumerState<EnquiryPage> {
 
         _buildLabel('Class'),
         DropdownButtonFormField<String>(
-          value: _selectedClass.isEmpty ? null : _selectedClass,
+          initialValue: _selectedClass.isEmpty ? null : _selectedClass,
           decoration: const InputDecoration(
             hintText: 'Select class',
             prefixIcon: Icon(Icons.class_outlined, size: 20),
@@ -502,7 +501,7 @@ class _EnquiryPageState extends ConsumerState<EnquiryPage> {
 
         _buildLabel('Preferred Timing'),
         DropdownButtonFormField<String>(
-          value: _preferredTiming.isEmpty ? null : _preferredTiming,
+          initialValue: _preferredTiming.isEmpty ? null : _preferredTiming,
           decoration: const InputDecoration(
             hintText: 'Select preferred timing',
             prefixIcon: Icon(Icons.access_time, size: 20),
@@ -741,7 +740,7 @@ class _EnquiryPageState extends ConsumerState<EnquiryPage> {
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
                 child: Text(
-                  'We\'ll match you with the best tutors for ${_selectedSubjects.join(', ')} — ${_selectedClass}',
+                  'We\'ll match you with the best tutors for ${_selectedSubjects.join(', ')} — $_selectedClass',
                   style: AppTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),

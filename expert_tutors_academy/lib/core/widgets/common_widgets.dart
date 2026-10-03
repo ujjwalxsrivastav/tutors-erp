@@ -297,7 +297,7 @@ class SectionHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: AppTheme.headlineSmall),
-          if (trailing != null) trailing!,
+          ?trailing,
         ],
       ),
     );

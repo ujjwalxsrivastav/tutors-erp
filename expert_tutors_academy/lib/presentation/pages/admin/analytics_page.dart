@@ -4,7 +4,6 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
 import '../../../data/models/lead_model.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/lead_service.dart';
 import '../../../data/services/operational_services.dart';
 
@@ -13,7 +12,7 @@ class AnalyticsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final leads = ref.watch(leadsByStatusProvider(null));
-    final tuitions = ref.watch(allTuitionsProvider);
+    final tuitionsAsync = ref.watch(allTuitionsProvider);
     final isDesktop = MediaQuery.of(context).size.width > 1000;
 
     return Scaffold(
@@ -53,12 +52,12 @@ class AnalyticsPage extends ConsumerWidget {
                 ? Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Expanded(child: _buildStatusChart(statusCounts)),
                     const SizedBox(width: 24),
-                    Expanded(child: _buildMetrics(allLeads, ref)),
+                    Expanded(child: _buildMetrics(allLeads, tuitionsAsync.valueOrNull)),
                   ])
                 : Column(children: [
                     _buildStatusChart(statusCounts),
                     const SizedBox(height: 24),
-                    _buildMetrics(allLeads, ref),
+                    _buildMetrics(allLeads, tuitionsAsync.valueOrNull),
                   ]),
             ]);
           },
@@ -103,10 +102,11 @@ class AnalyticsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetrics(List<LeadModel> leads, WidgetRef ref) {
+  Widget _buildMetrics(List<LeadModel> leads, List<dynamic>? tuitions) {
     final total = leads.length;
     final converted = leads.where((l) => l.status == 'CONVERTED').length;
     final convRate = total > 0 ? (converted / total * 100) : 0.0;
+    final activeTuitionsCount = tuitions?.where((t) => t.status == 'ACTIVE').length ?? 0;
 
     return Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(AppTheme.radiusMd), border: Border.all(color: AppTheme.border)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -115,6 +115,7 @@ class AnalyticsPage extends ConsumerWidget {
         _metricRow('Total Leads', '$total'),
         _metricRow('Converted', '$converted'),
         _metricRow('Conversion Rate', '${convRate.toStringAsFixed(1)}%'),
+        _metricRow('Active Tuitions', '$activeTuitionsCount'),
         _metricRow('Rejected', '${leads.where((l) => l.status == "REJECTED").length}'),
         _metricRow('Cancelled', '${leads.where((l) => l.status == "CANCELLED").length}'),
         _metricRow('No Response', '${leads.where((l) => l.status == "NO_RESPONSE").length}'),

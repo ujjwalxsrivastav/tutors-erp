@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/operational_services.dart';
 import '../../../data/services/auth_service.dart';
 
@@ -25,7 +24,7 @@ class AdminNotificationsPage extends ConsumerWidget {
         builder: (context, snapshot) {
           final notifications = snapshot.data ?? [];
           if (notifications.isEmpty) return const EmptyState(icon: Icons.notifications_off_outlined, title: 'No notifications', subtitle: 'You\'re all caught up!');
-          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: notifications.length, separatorBuilder: (_, __) => const SizedBox(height: 4),
+          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: notifications.length, separatorBuilder: (_, _) => const SizedBox(height: 4),
             itemBuilder: (_, i) {
               final n = notifications[i];
               return Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(

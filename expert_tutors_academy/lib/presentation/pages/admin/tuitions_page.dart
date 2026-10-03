@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/common_widgets.dart';
-import '../../../data/models/models.dart';
 import '../../../data/services/operational_services.dart';
 
 class TuitionsPage extends ConsumerWidget {
@@ -16,7 +15,7 @@ class TuitionsPage extends ConsumerWidget {
       body: tuitions.when(
         data: (list) {
           if (list.isEmpty) return const EmptyState(icon: Icons.auto_stories_outlined, title: 'No tuitions yet', subtitle: 'Tuitions will appear here when leads are converted.');
-          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: list.length, separatorBuilder: (_, __) => const SizedBox(height: 8),
+          return ListView.separated(padding: const EdgeInsets.all(16), itemCount: list.length, separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (_, i) {
               final t = list[i];
               return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(AppTheme.radiusMd), border: Border.all(color: AppTheme.border)),

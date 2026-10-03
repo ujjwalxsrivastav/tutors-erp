@@ -29,7 +29,7 @@ class _TutorsPageState extends ConsumerState<TutorsPage> with SingleTickerProvid
         bottom: TabBar(controller: _tabCtrl, tabs: tabs.map((t) => Tab(text: t)).toList(), onTap: (_) => setState(() {})),
       ),
       body: StreamBuilder(
-        stream: ref.read(tutorRepositoryProvider).streamTutors(verificationStatus: statuses[_tabCtrl.index]),
+        stream: ref.read(tutorRepositoryProvider).streamTutors(verificationStatus: currentStatus),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
           final tutors = snapshot.data ?? [];
@@ -37,7 +37,7 @@ class _TutorsPageState extends ConsumerState<TutorsPage> with SingleTickerProvid
 
           return ListView.separated(
             padding: const EdgeInsets.all(16), itemCount: tutors.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, i) => _buildTutorCard(context, ref, tutors[i]),
           );
         },

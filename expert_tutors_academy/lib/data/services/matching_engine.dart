@@ -259,7 +259,9 @@ class MatchingEngine {
     for (final loc in tutor.preferredLocations) {
       if (loc.toLowerCase().trim() == leadArea) return 1.0;
       if (loc.toLowerCase().contains(leadArea) ||
-          leadArea.contains(loc.toLowerCase())) return 0.7;
+          leadArea.contains(loc.toLowerCase())) {
+        return 0.7;
+      }
     }
 
     // If lat/lng available, calculate approximate distance
@@ -302,11 +304,15 @@ class MatchingEngine {
     if (q.contains('M.TECH') ||
         q.contains('M.SC') ||
         q.contains('M.A') ||
-        q.contains('MBA')) return 0.9;
+        q.contains('MBA')) {
+      return 0.9;
+    }
     if (q.contains('B.TECH') ||
         q.contains('B.E') ||
         q.contains('B.SC') ||
-        q.contains('B.ED')) return 0.7;
+        q.contains('B.ED')) {
+      return 0.7;
+    }
     if (q.contains('B.A') || q.contains('B.COM')) return 0.6;
     return 0.3;
   }
